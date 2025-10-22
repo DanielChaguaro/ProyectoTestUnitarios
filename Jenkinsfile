@@ -5,11 +5,22 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Compilando el proyecto con Maven...'
-                // Compila y empaqueta el código (sin ejecutar tests aún)
                 bat 'mvn clean package -DskipTests'
             }
         }
-        
     }
+    stage('Test') {
+            steps {
+                echo '🧪 Ejecutando tests de JUnit...'
+                bat 'mvn test'
+            }
+
+            post {
+                always {
+                    echo 'Publicando resultados de pruebas...'
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
 
 }
