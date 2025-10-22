@@ -57,25 +57,37 @@ pipeline {
     }
     post {
         success {
-            echo '✅ Build exitoso!'
-            githubNotify(
-                context: 'Jenkins Pipeline',
-                description: 'Build passed successfully',
-                status: 'SUCCESS',
-                repo: env.GITHUB_REPO,
-                credentialsId: env.GITHUB_CREDENTIALS
-            )
+            script {
+                def commitSha = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                echo "✅ Build exitoso para commit ${commitSha}"
+
+                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    bat """
+                        curl -X POST -H "Authorization: token %GITHUB_TOKEN%" ^
+                        -H "Accept: application/vnd.github.v3+json" ^
+                        https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses/${commitSha} ^
+                        -d "{\\"state\\":\\"success\\", \\"context\\":\\"Jenkins CI\\", \\"description\\":\\"Build passed successfully\\"}"
+                    """
+                }
+            }
         }
+
         failure {
-            echo '❌ Build fallido!'
-            githubNotify(
-                context: 'Jenkins Pipeline',
-                description: 'Build failed',
-                status: 'FAILURE',
-                repo: env.GITHUB_REPO,
-                credentialsId: env.GITHUB_CREDENTIALS
-            )
+            script {
+                def commitSha = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                echo "❌ Build fallido para commit ${commitSha}"
+
+                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+                    bat """
+                        curl -X POST -H "Authorization: token %GITHUB_TOKEN%" ^
+                        -H "Accept: application/vnd.github.v3+json" ^
+                        https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses/${commitSha} ^
+                        -d "{\\"state\\":\\"failure\\", \\"context\\":\\"Jenkins CI\\", \\"description\\":\\"Build failed\\"}"
+                    """
+                }
+            }
         }
+
         always {
             echo '📢 Pipeline finalizado.'
         }
