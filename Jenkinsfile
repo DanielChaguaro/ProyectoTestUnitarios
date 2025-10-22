@@ -64,10 +64,27 @@ pipeline {
     }
     post {
         success {
-            githubNotify context: 'CI Pipeline', status: 'SUCCESS', description: 'Build exitoso', targetUrl: env.BUILD_URL
+            echo '✅ Build exitoso!'
+            githubNotify(
+                context: 'Jenkins Pipeline',
+                description: 'Build passed successfully',
+                status: 'SUCCESS',
+                repo: env.GITHUB_REPO,
+                credentialsId: env.GITHUB_CREDENTIALS
+            )
         }
         failure {
-            githubNotify context: 'CI Pipeline', status: 'FAILURE', description: 'Falló la build', targetUrl: env.BUILD_URL
+            echo '❌ Build fallido!'
+            githubNotify(
+                context: 'Jenkins Pipeline',
+                description: 'Build failed',
+                status: 'FAILURE',
+                repo: env.GITHUB_REPO,
+                credentialsId: env.GITHUB_CREDENTIALS
+            )
+        }
+        always {
+            echo '📢 Pipeline finalizado.'
         }
     }
 }
