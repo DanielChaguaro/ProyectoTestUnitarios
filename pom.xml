@@ -104,6 +104,16 @@
                 <version>3.3.1</version>
 
                 <executions>
+                    <!-- Fase 1: generar el reporte -->
+                    <execution>
+                        <id>checkstyle-report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>checkstyle</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- Fase 2: fallar si hay errores -->
                     <execution>
                         <id>checkstyle-validation</id>
                         <phase>verify</phase>
@@ -114,14 +124,11 @@
                 </executions>
 
                 <configuration>
-                    <!-- Archivo de reglas (puedes personalizarlo) -->
                     <configLocation>google_checks.xml</configLocation>
-
-                    <!-- Falla la build si hay violaciones -->
-                    <failsOnError>true</failsOnError>
-
-                    <!-- Reporte más detallado -->
+                    <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <outputFile>target/checkstyle-result.xml</outputFile>
                 </configuration>
             </plugin>
         </plugins>
