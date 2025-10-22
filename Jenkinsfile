@@ -2,8 +2,10 @@ pipeline {
     agent any
 
     environment {
-        // Ruta donde se "desplegará" la app (tu entorno simulado)
         DEPLOY_PATH = "C:\\deploy\\mi-app"
+        GITHUB_REPO = "https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses"
+        GITHUB_TOKEN = credentials('github-token')
+        COMMIT_SHA = "${env.GIT_COMMIT}"           // Jenkins detecta el commit actual
     }
 
     stages {
@@ -56,7 +58,15 @@ pipeline {
                 // Crea directorio de despliegue
                 bat "mkdir %DEPLOY_PATH%"
                 // Copia el .jar generado al entorno simulado
-                bat "copy target\\*.jar %DEPLOY_PATH%\\app.jar"
+                bat "copy target\\*.jar %DEPLOY_PATH%\\deploy_integrador_calidad.jar"
+            }
+        }
+        post {
+            success {
+                githubNotify context: 'CI Pipeline', status: 'SUCCESS', description: 'Build exitoso', targetUrl: env.BUILD_URL
+            }
+            failure {
+                githubNotify context: 'CI Pipeline', status: 'FAILURE', description: 'Falló la build', targetUrl: env.BUILD_URL
             }
         }
     }
