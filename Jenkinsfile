@@ -56,14 +56,30 @@ pipeline {
         }
     }
     post {
-        success {
-            githubNotify context: 'Jenkins CI', status: 'SUCCESS', description: 'Build exitoso'
-        }
-        failure {
-            githubNotify context: 'Jenkins CI', status: 'FAILURE', description: 'Build fallido'
-        }
         always {
-            echo 'Notificación enviada a GitHub.'
+            echo '📣 Pipeline finalizado. Publicando estado en GitHub...'
+        }
+
+        success {
+            echo '✅ Éxito: notificando a GitHub...'
+            step([
+                $class: 'GitHubCommitStatusSetter',
+                contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins CI'],
+                statusResultSource: [$class: 'ConditionalStatusResultSource',
+                    results: [[state: 'SUCCESS', message: 'Build completado exitosamente']]
+                ]
+            ])
+        }
+
+        failure {
+            echo '❌ Fallo: notificando a GitHub...'
+            step([
+                $class: 'GitHubCommitStatusSetter',
+                contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins CI'],
+                statusResultSource: [$class: 'ConditionalStatusResultSource',
+                    results: [[state: 'FAILURE', message: 'Build fallido']]
+                ]
+            ])
         }
     }
 }
