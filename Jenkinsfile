@@ -62,11 +62,18 @@ pipeline {
                 echo "✅ Build exitoso para commit ${commitSha}"
 
                 withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
-                    bat """
-                        curl -X POST -H "Authorization: token %GITHUB_TOKEN%" ^
-                        -H "Accept: application/vnd.github.v3+json" ^
-                        https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses/${commitSha} ^
-                        -d "{\\"state\\":\\"success\\", \\"context\\":\\"Jenkins CI\\", \\"description\\":\\"Build passed successfully\\"}"
+                    powershell """
+                        \$headers = @{
+                            Authorization = 'token $env:GITHUB_TOKEN'
+                            Accept = 'application/vnd.github.v3+json'
+                        }
+                        \$body = @{
+                            state = 'success'
+                            context = 'Jenkins CI'
+                            description = 'Build passed successfully'
+                        } | ConvertTo-Json
+
+                        Invoke-RestMethod -Uri "https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses/${commitSha}" -Method Post -Headers \$headers -Body \$body
                     """
                 }
             }
@@ -78,11 +85,18 @@ pipeline {
                 echo "❌ Build fallido para commit ${commitSha}"
 
                 withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
-                    bat """
-                        curl -X POST -H "Authorization: token %GITHUB_TOKEN%" ^
-                        -H "Accept: application/vnd.github.v3+json" ^
-                        https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses/${commitSha} ^
-                        -d "{\\"state\\":\\"failure\\", \\"context\\":\\"Jenkins CI\\", \\"description\\":\\"Build failed\\"}"
+                    powershell """
+                        \$headers = @{
+                            Authorization = 'token $env:GITHUB_TOKEN'
+                            Accept = 'application/vnd.github.v3+json'
+                        }
+                        \$body = @{
+                            state = 'failure'
+                            context = 'Jenkins CI'
+                            description = 'Build failed'
+                        } | ConvertTo-Json
+
+                        Invoke-RestMethod -Uri "https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses/${commitSha}" -Method Post -Headers \$headers -Body \$body
                     """
                 }
             }
