@@ -8,8 +8,7 @@ pipeline {
                 bat 'mvn clean package -DskipTests'
             }
         }
-    }
-    stage('Test') {
+        stage('Test') {
             steps {
                 echo '🧪 Ejecutando tests de JUnit...'
                 bat 'mvn test'
@@ -22,5 +21,5 @@ pipeline {
                 }
             }
         }
-
+    }
 }
