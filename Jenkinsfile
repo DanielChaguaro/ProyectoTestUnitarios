@@ -61,7 +61,8 @@ pipeline {
                 bat "copy target\\*.jar %DEPLOY_PATH%\\deploy_integrador_calidad.jar"
             }
         }
-        post {
+    }
+    post {
             success {
                 githubNotify context: 'CI Pipeline', status: 'SUCCESS', description: 'Build exitoso', targetUrl: env.BUILD_URL
             }
@@ -69,5 +70,4 @@ pipeline {
                 githubNotify context: 'CI Pipeline', status: 'FAILURE', description: 'Falló la build', targetUrl: env.BUILD_URL
             }
         }
-    }
 }
