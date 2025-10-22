@@ -4,7 +4,7 @@ pipeline {
     environment {
         DEPLOY_PATH = "C:\\deploy\\mi-app"
         GITHUB_REPO = 'DanielChaguaro/ProyectoTestUnitarios'
-        GITHUB_CREDENTIALS = 'github-tokenp'
+        GITHUB_CREDENTIALS = 'github-token'
     }
 
     stages {
@@ -14,7 +14,7 @@ pipeline {
                 bat 'mvn clean package -DskipTests'
             }
         }
-        /*stage('Test') {
+        stage('Test') {
             steps {
                 echo ' Ejecutando tests de JUnit...'
                 bat 'mvn test'
@@ -53,57 +53,17 @@ pipeline {
                 // Copia el .jar generado al entorno simulado
                 bat "copy target\\*.jar %DEPLOY_PATH%\\deploy_integrador_calidad.jar"
             }
-        }*/
+        }
     }
     post {
         success {
-            script {
-                def commitSha = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
-                echo "✅ Build exitoso para commit ${commitSha}"
-
-                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
-                    powershell """
-                        \$headers = @{
-                            Authorization = 'token $env:GITHUB_TOKEN'
-                            Accept = 'application/vnd.github.v3+json'
-                        }
-                        \$body = @{
-                            state = 'success'
-                            context = 'Jenkins CI'
-                            description = 'Build passed successfully'
-                        } | ConvertTo-Json
-
-                        Invoke-RestMethod -Uri "https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses/${commitSha}" -Method Post -Headers \$headers -Body \$body
-                    """
-                }
-            }
+            githubNotify context: 'Jenkins CI', status: 'SUCCESS', description: 'Build exitoso'
         }
-
         failure {
-            script {
-                def commitSha = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
-                echo "❌ Build fallido para commit ${commitSha}"
-
-                withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
-                    powershell """
-                        \$headers = @{
-                            Authorization = 'token $env:GITHUB_TOKEN'
-                            Accept = 'application/vnd.github.v3+json'
-                        }
-                        \$body = @{
-                            state = 'failure'
-                            context = 'Jenkins CI'
-                            description = 'Build failed'
-                        } | ConvertTo-Json
-
-                        Invoke-RestMethod -Uri "https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses/${commitSha}" -Method Post -Headers \$headers -Body \$body
-                    """
-                }
-            }
+            githubNotify context: 'Jenkins CI', status: 'FAILURE', description: 'Build fallido'
         }
-
         always {
-            echo '📢 Pipeline finalizado.'
+            echo 'Notificación enviada a GitHub.'
         }
     }
 }
