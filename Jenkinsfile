@@ -4,7 +4,7 @@ pipeline {
     environment {
         DEPLOY_PATH = "C:\\deploy\\mi-app"
         GITHUB_REPO = 'DanielChaguaro/ProyectoTestUnitarios'
-        GITHUB_CREDENTIALS = 'github-token'
+        GITHUB_CREDENTIALS = 'github-tokenp'
         COMMIT_SHA = "${env.GIT_COMMIT}"           // Jenkins detecta el commit actual
     }
 
