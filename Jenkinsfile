@@ -10,7 +10,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                echo '🧪 Ejecutando tests de JUnit...'
+                echo ' Ejecutando tests de JUnit...'
                 bat 'mvn test'
             }
 
@@ -19,6 +19,12 @@ pipeline {
                     echo 'Publicando resultados de pruebas...'
                     junit 'target/surefire-reports/*.xml'
                 }
+            }
+        }
+        stage('Code Style - Checkstyle') {
+            steps {
+                echo ' Verificando estilo de código con Checkstyle...'
+                bat 'mvn checkstyle:check'
             }
         }
     }

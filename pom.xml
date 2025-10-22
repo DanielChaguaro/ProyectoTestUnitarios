@@ -97,6 +97,33 @@
                     <outputFile>spotbugs-report</outputFile>
                 </configuration>
             </plugin>
+            <!-- Maven Checkstyle Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.3.1</version>
+
+                <executions>
+                    <execution>
+                        <id>checkstyle-validation</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+                <configuration>
+                    <!-- Archivo de reglas (puedes personalizarlo) -->
+                    <configLocation>google_checks.xml</configLocation>
+
+                    <!-- Falla la build si hay violaciones -->
+                    <failsOnError>true</failsOnError>
+
+                    <!-- Reporte más detallado -->
+                    <consoleOutput>true</consoleOutput>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
