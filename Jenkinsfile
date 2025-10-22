@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         DEPLOY_PATH = "C:\\deploy\\mi-app"
-        GITHUB_REPO = "https://api.github.com/repos/DanielChaguaro/ProyectoTestUnitarios/statuses"
-        GITHUB_TOKEN = credentials('github-token')
+        GITHUB_REPO = 'DanielChaguaro/ProyectoTestUnitarios'
+        GITHUB_CREDENTIALS = 'github-token'
         COMMIT_SHA = "${env.GIT_COMMIT}"           // Jenkins detecta el commit actual
     }
 
@@ -63,11 +63,11 @@ pipeline {
         }
     }
     post {
-            success {
-                githubNotify context: 'CI Pipeline', status: 'SUCCESS', description: 'Build exitoso', targetUrl: env.BUILD_URL
-            }
-            failure {
-                githubNotify context: 'CI Pipeline', status: 'FAILURE', description: 'Falló la build', targetUrl: env.BUILD_URL
-            }
+        success {
+            githubNotify context: 'CI Pipeline', status: 'SUCCESS', description: 'Build exitoso', targetUrl: env.BUILD_URL
         }
+        failure {
+            githubNotify context: 'CI Pipeline', status: 'FAILURE', description: 'Falló la build', targetUrl: env.BUILD_URL
+        }
+    }
 }
