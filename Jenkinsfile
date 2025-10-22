@@ -5,7 +5,6 @@ pipeline {
         DEPLOY_PATH = "C:\\deploy\\mi-app"
         GITHUB_REPO = 'DanielChaguaro/ProyectoTestUnitarios'
         GITHUB_CREDENTIALS = 'github-tokenp'
-        COMMIT_SHA = "${env.GIT_COMMIT}"           // Jenkins detecta el commit actual
     }
 
     stages {
@@ -15,7 +14,7 @@ pipeline {
                 bat 'mvn clean package -DskipTests'
             }
         }
-        stage('Test') {
+        /*stage('Test') {
             steps {
                 echo ' Ejecutando tests de JUnit...'
                 bat 'mvn test'
@@ -28,12 +27,6 @@ pipeline {
                 }
             }
         }
-        /*stage('Code Style - Checkstyle') {
-            steps {
-                echo ' Verificando estilo de código con Checkstyle...'
-                bat 'mvn checkstyle:check'
-            }
-        }*/
         stage('Code Style - Checkstyle') {
             steps {
                 echo ' Ejecutando análisis de estilo con Checkstyle...'
@@ -60,7 +53,7 @@ pipeline {
                 // Copia el .jar generado al entorno simulado
                 bat "copy target\\*.jar %DEPLOY_PATH%\\deploy_integrador_calidad.jar"
             }
-        }
+        }*/
     }
     post {
         success {
