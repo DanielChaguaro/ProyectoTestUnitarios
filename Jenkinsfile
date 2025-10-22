@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        // Ruta donde se "desplegará" la app (tu entorno simulado)
+        DEPLOY_PATH = "C:\\deploy\\mi-app"
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -41,6 +46,17 @@ pipeline {
                     // Publica el reporte XML (si tienes el plugin Warnings Next Generation)
                     recordIssues tools: [checkStyle(pattern: 'target/checkstyle-result.xml')]
                 }
+            }
+        }
+        stage('Deploy Local') {
+            steps {
+                echo "Desplegando aplicación en entorno local..."
+                // Elimina versiones previas del despliegue
+                bat "if exist %DEPLOY_PATH% rmdir /S /Q %DEPLOY_PATH%"
+                // Crea directorio de despliegue
+                bat "mkdir %DEPLOY_PATH%"
+                // Copia el .jar generado al entorno simulado
+                bat "copy target\\*.jar %DEPLOY_PATH%\\app.jar"
             }
         }
     }
