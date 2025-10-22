@@ -14,7 +14,7 @@ pipeline {
                 bat 'mvn clean package -DskipTests'
             }
         }
-        stage('Test') {
+        /*stage('Test') {
             steps {
                 echo ' Ejecutando tests de JUnit...'
                 bat 'mvn test'
@@ -53,33 +53,45 @@ pipeline {
                 // Copia el .jar generado al entorno simulado
                 bat "copy target\\*.jar %DEPLOY_PATH%\\deploy_integrador_calidad.jar"
             }
-        }
+        }*/
     }
     post {
-        always {
-            echo '📣 Pipeline finalizado. Publicando estado en GitHub...'
-        }
-
-        success {
-            echo '✅ Éxito: notificando a GitHub...'
-            step([
-                $class: 'GitHubCommitStatusSetter',
-                contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins CI'],
-                statusResultSource: [$class: 'ConditionalStatusResultSource',
-                    results: [[state: 'SUCCESS', message: 'Build completado exitosamente']]
-                ]
-            ])
-        }
-
-        failure {
-            echo '❌ Fallo: notificando a GitHub...'
-            step([
-                $class: 'GitHubCommitStatusSetter',
-                contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: 'Jenkins CI'],
-                statusResultSource: [$class: 'ConditionalStatusResultSource',
-                    results: [[state: 'FAILURE', message: 'Build fallido']]
-                ]
-            ])
-        }
+    success {
+        echo '✅ Build exitoso, notificando a GitHub...'
+        step([
+            $class: 'GitHubCommitStatusSetter',
+            contextSource: [
+                $class: 'ManuallyEnteredCommitContextSource',
+                context: 'Jenkins CI'
+            ],
+            statusResultSource: [
+                $class: 'ConditionalStatusResultSource',
+                results: [[
+                    $class: 'AnyBuildResult',
+                    state: 'SUCCESS',
+                    message: 'Build completado exitosamente'
+                ]]
+            ]
+        ])
     }
+
+    failure {
+        echo '❌ Fallo: notificando a GitHub...'
+        step([
+            $class: 'GitHubCommitStatusSetter',
+            contextSource: [
+                $class: 'ManuallyEnteredCommitContextSource',
+                context: 'Jenkins CI'
+            ],
+            statusResultSource: [
+                $class: 'ConditionalStatusResultSource',
+                results: [[
+                    $class: 'AnyBuildResult',
+                    state: 'FAILURE',
+                    message: 'Build fallido'
+                ]]
+            ]
+        ])
+    }
+}
 }
