@@ -56,8 +56,14 @@ pipeline {
     post {
         success {
             echo 'Build exitoso, notificando a GitHub...'
-            githubNotify context: 'CI/CD', status: 'SUCCESS', description: 'Build succeeded', credentialsId: 'github-token'
-            echo ' Pipeline completado correctamente.'
+            githubNotify(
+                context: 'CI/CD',
+                status: 'SUCCESS',
+                repo: 'DanielChaguaro/ProyectoTestUnitarios',
+                account: 'DanielChaguaro',
+                sha: env.GIT_COMMIT,
+                credentialsId: 'github-token'
+            )
             step([
                 $class: 'GitHubCommitStatusSetter',
                 contextSource: [
@@ -76,8 +82,14 @@ pipeline {
 
         failure {
             echo 'Fallo: notificando a GitHub...'
-            githubNotify context: 'CI/CD', status: 'FAILURE', description: 'Build failed', credentialsId: 'github-token'
-            echo ' El pipeline falló. Revisar logs.'
+            githubNotify(
+                context: 'CI/CD',
+                status: 'FAILURE',
+                repo: 'DanielChaguaro/ProyectoTestUnitarios',
+                account: 'DanielChaguaro',
+                sha: env.GIT_COMMIT,
+                credentialsId: 'github-token'
+            )
             step([
                 $class: 'GitHubCommitStatusSetter',
                 contextSource: [
