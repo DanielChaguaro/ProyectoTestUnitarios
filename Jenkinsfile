@@ -56,38 +56,25 @@ pipeline {
     post {
         success {
             echo 'Build exitoso, notificando a GitHub...'
-            step([
-                $class: 'GitHubCommitStatusSetter',
-                contextSource: [
-                    $class: 'ManuallyEnteredCommitContextSource',
-                    context: 'Jenkins CI'
-                ],
-                statusResultSource: [
-                    $class: 'ConditionalStatusResultSource',
-                    results: [[
-                        $class: 'AnyBuildResult',
-                        state: 'SUCCESS',
-                    ]]
-                ]
-            ])
+            githubNotify(
+                context: 'CI/CD',
+                status: 'SUCCESS',
+                repo: 'https://github.com/DanielChaguaro/ProyectoTestUnitarios',
+                account: 'DanielChaguaro',
+                sha: env.GIT_COMMIT,
+                credentialsId: 'github-token'
+            )
         }
 
         failure {
-            echo 'Fallo: notificando a GitHub...'
-            step([
-                $class: 'GitHubCommitStatusSetter',
-                contextSource: [
-                    $class: 'ManuallyEnteredCommitContextSource',
-                    context: 'Jenkins CI'
-                ],
-                statusResultSource: [
-                    $class: 'ConditionalStatusResultSource',
-                    results: [[
-                        $class: 'AnyBuildResult',
-                        state: 'FAILURE',
-                    ]]
-                ]
-            ])
+            githubNotify(
+                context: 'CI/CD',
+                status: 'FAILURE',
+                repo: 'https://github.com/DanielChaguaro/ProyectoTestUnitarios',
+                account: 'DanielChaguaro',
+                sha: env.GIT_COMMIT,
+                credentialsId: 'github-token'
+            )
         }
     }
     
