@@ -62,7 +62,7 @@ pipeline {
                 repo: 'DanielChaguaro/ProyectoTestUnitarios',
                 account: 'DanielChaguaro',
                 sha: env.GIT_COMMIT,
-                credentialsId: 'github-token'
+                credentialsId: 'github-tokenp'
             )
             step([
                 $class: 'GitHubCommitStatusSetter',
@@ -88,7 +88,7 @@ pipeline {
                 repo: 'DanielChaguaro/ProyectoTestUnitarios',
                 account: 'DanielChaguaro',
                 sha: env.GIT_COMMIT,
-                credentialsId: 'github-token'
+                credentialsId: 'github-tokenp'
             )
             step([
                 $class: 'GitHubCommitStatusSetter',
