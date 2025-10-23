@@ -33,7 +33,7 @@ pipeline {
             }
             post {
                 always {
-                    // Guarda el reporte HTML como artefacto
+
                     archiveArtifacts artifacts: 'target/site/checkstyle.html', fingerprint: true
 
                     // Publica el reporte XML (si tienes el plugin Warnings Next Generation)
@@ -67,7 +67,6 @@ pipeline {
                     results: [[
                         $class: 'AnyBuildResult',
                         state: 'SUCCESS',
-                        message: 'Build completado exitosamente'
                     ]]
                 ]
             ])
@@ -86,10 +85,19 @@ pipeline {
                     results: [[
                         $class: 'AnyBuildResult',
                         state: 'FAILURE',
-                        message: 'Build fallido'
                     ]]
                 ]
             ])
+        }
+    }
+    post {
+        success {
+            githubNotify context: 'CI/CD', status: 'SUCCESS', description: 'Build succeeded', credentialsId: 'github-token'
+            echo ' Pipeline completado correctamente.'
+        }
+        failure {
+            githubNotify context: 'CI/CD', status: 'FAILURE', description: 'Build failed', credentialsId: 'github-token'
+            echo ' El pipeline falló. Revisar logs.'
         }
     }
 }
