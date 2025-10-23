@@ -59,7 +59,7 @@ pipeline {
             githubNotify(
                 context: 'CI/CD',
                 status: 'SUCCESS',
-                repo: 'https://github.com/DanielChaguaro/ProyectoTestUnitarios',
+                repo: 'ProyectoTestUnitarios',
                 account: 'DanielChaguaro',
                 sha: env.GIT_COMMIT,
                 credentialsId: 'github-tokenp'
@@ -70,7 +70,7 @@ pipeline {
             githubNotify(
                 context: 'CI/CD',
                 status: 'FAILURE',
-                repo: 'https://github.com/DanielChaguaro/ProyectoTestUnitarios',
+                repo: 'ProyectoTestUnitarios',
                 account: 'DanielChaguaro',
                 sha: env.GIT_COMMIT,
                 credentialsId: 'github-tokenp'
