@@ -1,41 +1,86 @@
 version: 2.1
 
-jobs:
-  build_and_test:
+executors:
+  java_executor:
     docker:
-      - image: cimg/openjdk:17.0  
-    environment:
-      DEPLOY_PATH: /tmp/deploy
+      - image: cimg/openjdk:17.0 
+
+jobs:
+  build:
+    executor: java_executor
     steps:
       - checkout
-
+      - restore_cache:
+          keys:
+            - maven-{{ checksum "pom.xml" }}
+            - maven-
       - run:
-          name: Build (Maven package)
+          name: Build project (Maven)
           command: mvn clean package -DskipTests
+      - save_cache:
+          key: maven-{{ checksum "pom.xml" }}
+          paths:
+            - ~/.m2
+      - store_artifacts:
+          path: target/
+          destination: build/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - target
 
+  test:
+    executor: java_executor
+    steps:
+      - attach_workspace:
+          at: .
       - run:
-          name: Run Tests
+          name: Run JUnit Tests
           command: mvn test
-
       - store_test_results:
           path: target/surefire-reports/
 
+  checkstyle:
+    executor: java_executor
+    steps:
+      - attach_workspace:
+          at: .
       - run:
-          name: Checkstyle analysis
+          name: Static Code Analysis - Checkstyle
           command: mvn checkstyle:checkstyle
-
       - store_artifacts:
           path: target/site/checkstyle.html
-          destination: checkstyle-report
+          destination: checkstyle-report/
 
+  deploy_local:
+    executor: java_executor
+    environment:
+      DEPLOY_PATH: /tmp/deploy
+    steps:
+      - attach_workspace:
+          at: .
       - run:
-          name: Deploy Local (Simulación)
+          name: Deploy Local Simulation
           command: |
             rm -rf $DEPLOY_PATH
             mkdir -p $DEPLOY_PATH
             cp target/*.jar $DEPLOY_PATH/deploy_integrador_calidad.jar
+      - store_artifacts:
+          path: /tmp/deploy/deploy_integrador_calidad.jar
+          destination: deploy/
 
 workflows:
+  version: 2
   build_test_deploy:
     jobs:
-      - build_and_test
+      - build
+      - test:
+          requires:
+            - build
+      - checkstyle:
+          requires:
+            - build
+      - deploy_local:
+          requires:
+            - test
+            - checkstyle
