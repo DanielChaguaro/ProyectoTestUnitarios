@@ -4,6 +4,21 @@ import java.util.Scanner;
 
 public class MainApp {
     public static void main(String[] args) {
+        // Inicializar LaunchDarkly
+        LaunchDarklyManager.initialize();
+
+        // Nombre del feature flag definido en LaunchDarkly
+        String featureFlag = "demo-feature";
+
+        // Se usa un userKey cualquiera (puede ser dinámico)
+        boolean permitido = LaunchDarklyManager.isEnabled(featureFlag, "usuario-app");
+
+        if (!permitido) {
+            System.out.println("La funcionalidad de registrar estudiantes está desactivada por LaunchDarkly.");
+            LaunchDarklyManager.shutdown();
+            return;
+        }
+
         StudentService service = new StudentService();
         Scanner scanner = new Scanner(System.in);
 
