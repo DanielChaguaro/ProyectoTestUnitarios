@@ -41,9 +41,9 @@ public class MainApp {
                     continuar = false;
                 }
             } catch (NumberFormatException e) {
-                System.out.println("⚠️ Error: La calificación debe ser un número válido.");
+                System.out.println("Error: La calificación debe ser un número válido.");
             } catch (IllegalArgumentException e) {
-                System.out.println("⚠️ Error: " + e.getMessage());
+                System.out.println("Error: " + e.getMessage());
             }
         }
 
