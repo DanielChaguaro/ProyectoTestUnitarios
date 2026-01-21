@@ -14,25 +14,29 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 1️⃣ Instalar Strawberry Perl
-    - name: Install Perl
+    - name: Install Strawberry Perl
       run: |
         choco install strawberryperl -y
 
-    # 2️⃣ Clonar Nikto
     - name: Install Nikto
       run: |
         git clone https://github.com/sullo/nikto.git C:\nikto
 
-    # 3️⃣ Levantar la aplicación (EJEMPLO .NET)
+    # 🔧 RESTORE + BUILD (ESPECIFICANDO PROYECTO)
+    - name: Restore and Build
+      run: |
+        dotnet restore ./ProyectoTestUnitarios/ProyectoTestUnitarios.csproj
+        dotnet build ./ProyectoTestUnitarios/ProyectoTestUnitarios.csproj
+
+    # ▶️ EJECUTAR APP (PowerShell correcto)
     - name: Run application
       run: |
-        dotnet restore
-        dotnet build
-        start /B dotnet run --project ProyectoTestUnitarios
-        timeout /T 15
+        Start-Process dotnet `
+          -ArgumentList "run --project ./ProyectoTestUnitarios/ProyectoTestUnitarios.csproj" `
+          -NoNewWindow
+        Start-Sleep -Seconds 15
 
-    # 4️⃣ Ejecutar Nikto
+    # 🔐 DAST Nikto
     - name: Run Nikto Scan
       run: |
         perl C:\nikto\program\nikto.pl `
@@ -40,7 +44,6 @@ jobs:
           -o nikto-report.html `
           -Format html
 
-    # 5️⃣ Guardar reporte
     - name: Upload Nikto Report
       uses: actions/upload-artifact@v4
       with:
