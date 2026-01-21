@@ -22,28 +22,23 @@ jobs:
       run: |
         git clone https://github.com/sullo/nikto.git C:\nikto
 
-    # 🔧 RESTORE + BUILD (ESPECIFICANDO PROYECTO)
-    - name: Restore and Build
-      run: |
-        dotnet restore ./ProyectoTestUnitarios/ProyectoTestUnitarios.csproj
-        dotnet build ./ProyectoTestUnitarios/ProyectoTestUnitarios.csproj
-
-    # ▶️ EJECUTAR APP (PowerShell correcto)
+     # Restaurar, compilar y ejecutar la aplicación (ejemplo .NET)
     - name: Run application
       run: |
-        Start-Process dotnet `
-          -ArgumentList "run --project ./ProyectoTestUnitarios/ProyectoTestUnitarios.csproj" `
-          -NoNewWindow
-        Start-Sleep -Seconds 15
+        dotnet restore
+        dotnet build
+        start /B dotnet run
+        timeout /T 15
 
-    # 🔐 DAST Nikto
+    #  Ejecutar DAST con Nikto
     - name: Run Nikto Scan
       run: |
-        perl C:\nikto\program\nikto.pl `
-          -h http://localhost:5000 `
-          -o nikto-report.html `
+        perl C:\nikto\program\nikto.pl ^
+          -h http://localhost:5000 ^
+          -o nikto-report.html ^
           -Format html
 
+    # Guardar el reporte como artefacto
     - name: Upload Nikto Report
       uses: actions/upload-artifact@v4
       with:
