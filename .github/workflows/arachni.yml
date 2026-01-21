@@ -27,23 +27,25 @@ jobs:
       - name: Run application
         run: |
           java -jar target/*.jar &
-          sleep 30
+          sleep 60
 
-      - name: Install Arachni
+      - name: Run Arachni DAST Scan
         run: |
-          sudo apt update
-          sudo apt install -y arachni
-
-      - name: Run Arachni Scan
-        run: |
-          arachni http://localhost:8080 \
-            --report-save-path=arachni-report.afr
+          docker run --rm \
+            --network host \
+            arachni/arachni \
+            http://localhost:8080 \
+            --report-save-path=/tmp/arachni.afr
 
       - name: Generate Arachni Report
         run: |
-          arachni_reporter arachni-report.afr --reporter=html:outfile=arachni-report.html
+          docker run --rm \
+            -v $PWD:/reports \
+            arachni/arachni \
+            arachni_reporter /tmp/arachni.afr \
+            --reporter=html:outfile=/reports/arachni-report.html
 
-      - name: Upload report
+      - name: Upload Arachni report
         uses: actions/upload-artifact@v4
         with:
           name: arachni-report
