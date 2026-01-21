@@ -1,0 +1,48 @@
+name: DAST - Nikto Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  nikto_dast:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 1️⃣ Instalar Strawberry Perl
+    - name: Install Perl
+      run: |
+        choco install strawberryperl -y
+
+    # 2️⃣ Clonar Nikto
+    - name: Install Nikto
+      run: |
+        git clone https://github.com/sullo/nikto.git C:\nikto
+
+    # 3️⃣ Levantar la aplicación (EJEMPLO .NET)
+    - name: Run application
+      run: |
+        dotnet restore
+        dotnet build
+        start /B dotnet run --project ProyectoTestUnitarios
+        timeout /T 15
+
+    # 4️⃣ Ejecutar Nikto
+    - name: Run Nikto Scan
+      run: |
+        perl C:\nikto\program\nikto.pl `
+          -h http://localhost:5000 `
+          -o nikto-report.html `
+          -Format html
+
+    # 5️⃣ Guardar reporte
+    - name: Upload Nikto Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: nikto-dast-report
+        path: nikto-report.html
