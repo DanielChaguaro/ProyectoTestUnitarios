@@ -1,0 +1,50 @@
+name: DAST - Arachni Scan
+
+on:
+  workflow_run:
+    workflows: ["SAST - Semgrep Scan"]
+    types:
+      - completed
+
+jobs:
+  arachni:
+    name: Arachni DAST
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build project
+        run: mvn clean package
+
+      - name: Run application
+        run: |
+          java -jar target/*.jar &
+          sleep 30
+
+      - name: Install Arachni
+        run: |
+          sudo apt update
+          sudo apt install -y arachni
+
+      - name: Run Arachni Scan
+        run: |
+          arachni http://localhost:8080 \
+            --report-save-path=arachni-report.afr
+
+      - name: Generate Arachni Report
+        run: |
+          arachni_reporter arachni-report.afr --reporter=html:outfile=arachni-report.html
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: arachni-report
+          path: arachni-report.html
