@@ -34,7 +34,7 @@ jobs:
           docker run --rm \
             --network host \
             arachni/arachni \
-            http://localhost:8080 \
+            arachni http://localhost:8080 \
             --report-save-path=/tmp/arachni.afr
 
       - name: Generate Arachni Report
