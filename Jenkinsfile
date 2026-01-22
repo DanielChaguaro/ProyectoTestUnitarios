@@ -56,25 +56,10 @@ pipeline {
     post {
         success {
             echo 'Build exitoso, notificando a GitHub...'
-            githubNotify(
-                context: 'CI/CD',
-                status: 'SUCCESS',
-                repo: 'ProyectoTestUnitarios',
-                account: 'DanielChaguaro',
-                sha: env.GIT_COMMIT,
-                credentialsId: 'github-tokenp'
-            )
         }
 
         failure {
-            githubNotify(
-                context: 'CI/CD',
-                status: 'FAILURE',
-                repo: 'ProyectoTestUnitarios',
-                account: 'DanielChaguaro',
-                sha: env.GIT_COMMIT,
-                credentialsId: 'github-tokenp'
-            )
+            echo 'Build fallido'
         }
     }
     
